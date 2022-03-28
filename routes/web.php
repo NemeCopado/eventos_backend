@@ -18,3 +18,4 @@ use Illuminate\Support\Facades\Route;
 // });
 
 Route::resource('/usuarios', 'App\Http\Controllers\UsuariosController');
+Route::resource('/instituciones', 'App\Http\Controllers\InstitucionesController');

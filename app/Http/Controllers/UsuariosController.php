@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuarios;
-//use App\Models\Instituciones;
+use App\Models\Instituciones;
 use Illuminate\Support\Facades\DB;
 
 class UsuariosController extends Controller
