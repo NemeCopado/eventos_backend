@@ -169,4 +169,56 @@ class InstitucionesController extends Controller
 
     }
 
+    //ELIMINAR INSTITUCION
+    public function destroy($id, Request $request){
+
+        //Buscamos la institución requerida por el usuario para eliminar
+        $institucion = DB::table('usuarios')
+            ->leftJoin('instituciones', 'usuarios.id_insti', 'instituciones.id_insti')
+            ->leftjoin('municipios', 'instituciones.id_municipio', '=', 'municipios.id_municipio')
+            ->select('instituciones.nombre as institucion',
+                'instituciones.domicilio',
+                'municipios.nombre as municipio',
+                DB::raw('CONCAT(usuarios.nombre, " ", usuarios.ape_pat, " ", usuarios.ape_mat) AS enlace'))
+            ->where('instituciones.id_insti', $id)
+            ->get();
+
+        //Si existe la institución solicitada continuamos con la eliminación
+        if(!empty($institucion[0])){
+
+            $id_user = DB::table('usuarios')->where('id_insti', $id)->value('id_user');
+            if (Usuarios::where('id_user', $id_user)->delete()){
+                if (DB::table('instituciones')->where('id_insti', "=", $id)->delete()){
+                    $json = array(
+                        "status" => 200,
+                        "details" => "Se eliminó la institución y su enlace satisfactoriamente"
+                    );
+                    return json_encode($json, true);
+                }else{
+                    $json = array(
+                        "status" => 200,
+                        "details" => "Hubo un problema al eliminar la institución"
+                    );
+                    return json_encode($json, true);
+                }
+            }else{
+            $json = array(
+                "status" => 200,
+                "details" => "Hubo un problema al eliminar al usuario"
+            );
+            return json_encode($json, true);
+            }
+
+        //Si no existe la institución solicitada mandamos mensaje del status
+        }else{
+            $json = array(
+                "status" => 200,
+                "details" => "No hay existe alguna institución registrada con ese Id"
+            );
+        }
+        return json_encode($json, true);
+
+    }
+
+
 }

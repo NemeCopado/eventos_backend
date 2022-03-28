@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class UsuariosController extends Controller
 {
+
     //LISTADO DE USUARIOS
     public function index(){
 
