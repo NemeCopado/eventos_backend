@@ -34,4 +34,57 @@ class VoluntariosController extends Controller
 
     }
 
+    public function destroy($id_voluntario){
+
+        if (DB::table('voluntarios')->where('id_voluntario', $id_voluntario)->update(['activo'=>0, 'eliminado'=>1])){
+            $json = array(
+                "status" => 200,
+                "details" => "Se eliminó el voluntario satisfactoriamente"
+            );
+            return json_encode($json, true);
+        }else{
+            $json = array(
+                "status" => 200,
+                "details" => "Error al eliminar el voluntario"
+            );
+            return json_encode($json, true);
+        }
+
+    }
+
+    public function show($id_institucion){
+
+        $institucion = DB::table('instituciones')
+            ->where('id_insti', $id_institucion)
+            ->where('activo', 1)
+            ->get();
+
+        if(!empty($institucion[0])){
+
+            $voluntarios = DB::table('voluntarios')
+                ->where('id_insti', $id_institucion)
+                ->where('activo', 1)
+                ->get();
+
+            $json = array(
+                "status"=>200,
+                "total_registros"=>count($voluntarios),
+                "details"=>$voluntarios
+            );
+
+            return json_encode($json, true);
+
+        }else{
+
+            $json = array(
+                "status"=>200,
+                "details"=>'No hay ninguna institución registrada con esa Id'
+            );
+
+            return json_encode($json, true);
+
+        }
+
+    }
+
 }

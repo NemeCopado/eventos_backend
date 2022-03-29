@@ -16,6 +16,6 @@ class VerifyCsrfToken extends Middleware
         'http://localhost/eventos_backend/public/usuarios/*',
         'http://localhost/eventos_backend/public/instituciones',
         'http://localhost/eventos_backend/public/instituciones/*',
-        'http://localhost/eventos_backend/public/voluntarios'
+        'http://localhost/eventos_backend/public/voluntarios/*'
     ];
 }
