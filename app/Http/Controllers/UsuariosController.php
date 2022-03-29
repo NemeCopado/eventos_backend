@@ -26,6 +26,8 @@ class UsuariosController extends Controller
                 'usuarios.tel as telefono',
                 'usuarios.email as correo_electronico',
                 'usuarios.activo')
+            ->where('usuarios.activo', 1)
+            ->where('instituciones.activo', 1)
             ->paginate(15);
 
         $json = array(
@@ -51,6 +53,8 @@ class UsuariosController extends Controller
                 'usuarios.email as correo_electronico',
                 'usuarios.activo')
             ->where('usuarios.id_user', $id)
+            ->where('usuarios.activo', 1)
+            ->where('instituciones.activo', 1)
             ->get();
 
         if(!empty($usuario[0])){

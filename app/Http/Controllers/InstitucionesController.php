@@ -23,6 +23,8 @@ class InstitucionesController extends Controller
                 'instituciones.domicilio',
                 'municipios.nombre as municipio',
                 DB::raw('CONCAT(usuarios.nombre, " ", usuarios.ape_pat, " ", usuarios.ape_mat) AS enlace'))
+            ->where('usuarios.activo', 1)
+            ->where('instituciones.activo', 1)
             ->get();
 
         $json = array(
@@ -46,6 +48,8 @@ class InstitucionesController extends Controller
                 'municipios.nombre as municipio',
                 DB::raw('CONCAT(usuarios.nombre, " ", usuarios.ape_pat, " ", usuarios.ape_mat) AS enlace'))
             ->where('instituciones.id_insti', $id)
+            ->where('usuarios.activo', 1)
+            ->where('instituciones.activo', 1)
             ->get();
 
         if(!empty($institucion[0])){
@@ -169,10 +173,10 @@ class InstitucionesController extends Controller
 
     }
 
-    //ELIMINAR INSTITUCION
+    //ELIMINADO LÓGICO DE INSTITUCION Y ENLACE
     public function destroy($id, Request $request){
 
-        //Buscamos la institución requerida por el usuario para eliminar
+        //Buscamos la institución requerida por el usuario para eliminado lógico
         $institucion = DB::table('usuarios')
             ->leftJoin('instituciones', 'usuarios.id_insti', 'instituciones.id_insti')
             ->leftjoin('municipios', 'instituciones.id_municipio', '=', 'municipios.id_municipio')
@@ -187,8 +191,10 @@ class InstitucionesController extends Controller
         if(!empty($institucion[0])){
 
             $id_user = DB::table('usuarios')->where('id_insti', $id)->value('id_user');
-            if (Usuarios::where('id_user', $id_user)->delete()){
-                if (DB::table('instituciones')->where('id_insti', "=", $id)->delete()){
+//            if (Usuarios::where('id_user', $id_user)->delete()){
+            if (DB::table('usuarios')->where('id_user', $id_user)->update(['activo'=>0])){
+//                if (DB::table('instituciones')->where('id_insti', "=", $id)->delete()){
+                if(DB::table('instituciones')->where('id_insti', $id)->update(['activo'=>0])){
                     $json = array(
                         "status" => 200,
                         "details" => "Se eliminó la institución y su enlace satisfactoriamente"
