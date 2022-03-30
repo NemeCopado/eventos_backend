@@ -146,23 +146,23 @@ class VoluntariosController extends Controller
             //Si pasa la validación de formato, continuamos el proceso
             }else{
 
-                $voluntarios = new Voluntarios();
-                $voluntarios->nombre=$datos["nombre"];
-                $voluntarios->ape_pat=$datos["ape_pat"];
-                $voluntarios->ape_mat=$datos["ape_mat"];
-                $voluntarios->id_insti=$datos["id_insti"];
-                $voluntarios->curp=$datos["curp"];
-                $voluntarios->email=$datos["email"];
-                $voluntarios->tel=$datos["tel"];
-                $voluntarios->fecha_nacimiento=$datos["fecha_nacimiento"];
-                $voluntarios->id_municipio=$datos["id_municipio"];
-                $voluntarios->activo=1;
-                $voluntarios->eliminado=0;
+                $voluntario = new Voluntarios();
+                $voluntario->nombre=$datos["nombre"];
+                $voluntario->ape_pat=$datos["ape_pat"];
+                $voluntario->ape_mat=$datos["ape_mat"];
+                $voluntario->id_insti=$datos["id_insti"];
+                $voluntario->curp=$datos["curp"];
+                $voluntario->email=$datos["email"];
+                $voluntario->tel=$datos["tel"];
+                $voluntario->fecha_nacimiento=$datos["fecha_nacimiento"];
+                $voluntario->id_municipio=$datos["id_municipio"];
+                $voluntario->activo=1;
+                $voluntario->eliminado=0;
 
-                if ($voluntarios->save()){
+                if ($voluntario->save()){
                     $json = array(
                         "status" => 200,
-                        "detalles" => "Se registro el voluntario satisfactoriamente "."con Id: ".$voluntarios->id,
+                        "detalles" => "Se registro el voluntario satisfactoriamente "."con Id: ".$voluntario->id,
                     );
                     return json_encode($json, true);
                 }else{

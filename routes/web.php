@@ -47,3 +47,13 @@ Route::get('/voluntarios/institucion/{id_institucion}', 'App\Http\Controllers\Vo
 Route::post('/voluntarios/store', 'App\Http\Controllers\VoluntariosController@store');
 //Asignación de sedes a los voluntarios
 Route::post('/voluntarios/asignarSede', 'App\Http\Controllers\VoluntariosController@asignarSede');
+
+//RUTAS DE SEDES
+//Listado de sedes
+Route::get('/sedes', 'App\Http\Controllers\SedesController@index');
+//Alta de sedes
+Route::post('/sedes/store', 'App\Http\Controllers\SedesController@store');
+//Eliminación de una sede
+Route::delete('/sedes/destroy/{id_sede}', 'App\Http\Controllers\SedesController@destroy');
+//Actualización de una sede
+Route::put('/sedes/update/{id_sede}', 'App\Http\Controllers\SedesController@update');
