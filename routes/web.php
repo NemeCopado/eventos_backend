@@ -17,6 +17,33 @@ use Illuminate\Support\Facades\Route;
 //     return view('welcome');
 // });
 
-Route::resource('/usuarios', 'App\Http\Controllers\UsuariosController');
-Route::resource('/instituciones', 'App\Http\Controllers\InstitucionesController');
-Route::resource('/voluntarios', 'App\Http\Controllers\VoluntariosController');
+// RUTAS DE USUARIOS
+//Listado de usuarios
+Route::get('/usuarios', 'App\Http\Controllers\UsuariosController@index');
+//Listado de un solo usuario
+Route::get('/usuarios/{id}', 'App\Http\Controllers\UsuariosController@show');
+//Actualización de un usuario
+Route::put('/usuarios/update/{id}', 'App\Http\Controllers\UsuariosController@update');
+
+
+// RUTAS DE INSTITUCIONES
+//Listado de instituciones
+Route::get('/instituciones', 'App\Http\Controllers\InstitucionesController@index');
+//Listado una sola institución
+Route::get('/instituciones/{id}', 'App\Http\Controllers\InstitucionesController@show');
+//Alta de institución con su enlace
+Route::post('/instituciones/store', 'App\Http\Controllers\InstitucionesController@store');
+//Eliminación de institución con su enlace
+Route::delete('/instituciones/destroy/{id}', 'App\Http\Controllers\InstitucionesController@destroy');
+
+// RUTAS DE VOLUNTARIOS
+//Listado de voluntarios
+Route::get('/voluntarios', 'App\Http\Controllers\VoluntariosController@index');
+//Eliminación de un voluntario
+Route::delete('/voluntarios/destroy/{id_voluntario}', 'App\Http\Controllers\VoluntariosController@destroy');
+//Listar registro de todos los voluntarios por institución
+Route::get('/voluntarios/institucion/{id_institucion}', 'App\Http\Controllers\VoluntariosController@show');
+//Registro de voluntarios
+Route::post('/voluntarios/store', 'App\Http\Controllers\VoluntariosController@store');
+//Asignación de sedes a los voluntarios
+Route::post('/voluntarios/asignarSede', 'App\Http\Controllers\VoluntariosController@asignarSede');

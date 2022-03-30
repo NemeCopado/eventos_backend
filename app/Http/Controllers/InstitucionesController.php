@@ -173,7 +173,7 @@ class InstitucionesController extends Controller
 
     }
 
-    //ELIMINADO LÓGICO DE INSTITUCION Y ENLACE
+    //ELIMINADO LÓGICO DE INSTITUCIÓN Y ENLACE
     public function destroy($id, Request $request){
 
         //Buscamos la institución requerida por el usuario para eliminado lógico

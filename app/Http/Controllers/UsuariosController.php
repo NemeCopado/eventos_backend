@@ -65,7 +65,7 @@ class UsuariosController extends Controller
         }else{
             $json = array(
                 "status" => 200,
-                "details" => "No hay ningún usuario registrado con ese ID"
+                "details" => "Este usuario no existe o está desactivado."
             );
         }
         return json_encode($json, true);

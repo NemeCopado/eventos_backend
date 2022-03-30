@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Detalle_Jornadas;
+use App\Models\Sedes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -11,6 +13,7 @@ use App\Models\Voluntarios;
 class VoluntariosController extends Controller
 {
 
+    //Listado de voluntarios
     public function index(){
 
         //Select de los voluntarios
@@ -37,6 +40,7 @@ class VoluntariosController extends Controller
 
     }
 
+    //Eliminación de un voluntario
     public function destroy($id_voluntario){
 
         //Update de activo y eliminado
@@ -56,6 +60,7 @@ class VoluntariosController extends Controller
 
     }
 
+    //Listar el registro de todos los voluntarios por institución
     public function show($id_institucion){
 
         //Select a la tabla institución con el id requerido
@@ -96,6 +101,7 @@ class VoluntariosController extends Controller
 
     }
 
+    //Registro de voluntarios
     public function store(Request $request){
 
         //Recolección de datos de los input
@@ -174,5 +180,90 @@ class VoluntariosController extends Controller
 
 
     }
+
+    //Asignación de sedes a voluntarios
+    public function asignarSede(Request $request){
+
+        //Recolección de datos de los input
+        $datos = array( "id_jornada"=>$request->input('id_jornada'),
+            "id_voluntario"=>$request->input('id_voluntario'),
+            "id_sede"=>$request->input('id_sede'),
+            "turno"=>$request->input('turno'),
+            "uuid"=>$request->input('uuid'),
+            "horas"=>$request->input('horas'),
+            "activo"=>$request->input('activo'),
+        );
+
+        //Validamos que no estén vacíos los datos ingresados por el usuario
+        if(!empty($datos)){
+
+            //Validar formato de datos
+            $validator = Validator::make($datos, [
+                'id_jornada' => 'required|integer',
+                'id_voluntario'=> 'required|integer',
+                'id_sede'=>'required|integer',
+                'turno'=>'required|string',
+                'uuid'=>'required|string|string',
+                'horas'=>'required|integer',
+                'activo'=>'required|integer',
+            ]);
+
+            if ($validator -> fails()) {
+
+                $errors = $validator->errors();
+
+                $json = array(
+                    "status" => 404,
+                    "detalles" => $errors
+                );
+                return json_encode($json, true);
+
+                //Si pasa la validación de formato, continuamos el proceso
+            }else{
+
+                //Buscamos la información del voluntario
+                $voluntario = Voluntarios::where('id_voluntario', $datos['id_voluntario'])->first();
+                //Buscamos la información de la sede
+                $sede = Sedes::where('id_sede', $datos['id_sede'])->first();
+
+                //Si el municipio de la sede coincide con el municipio del voluntario registrado continúa el proceso
+                if ($voluntario->id_municipio == $sede -> id_municipio){
+
+                    $detalle_jornada = new Detalle_Jornadas();
+                    $detalle_jornada -> id_jornada = $datos['id_jornada'];
+                    $detalle_jornada -> id_voluntario = $datos['id_voluntario'];
+                    $detalle_jornada -> id_sede = $datos['id_sede'];
+                    $detalle_jornada -> turno = $datos['turno'];
+                    $detalle_jornada -> uuid = $datos['uuid'];
+                    $detalle_jornada -> horas = $datos['horas'];
+                    $detalle_jornada -> correo_enviado = 1;
+                    $detalle_jornada -> eliminado = 0;
+                    $detalle_jornada -> activo = $datos['activo'];
+
+                    if($detalle_jornada->save()){
+                        $json = array(
+                            "status" => 200,
+                            "detalles" => 'Se ha hecho la asignación al voluntario exitosamente.'
+                        );
+                        return json_encode($json, true);
+                    }
+
+                //Retornamos error de municipios distintos
+                }else{
+
+                    $json = array(
+                        "status" => 404,
+                        "detalles" => 'El municipio de la sede no coincide con el municipio del voluntario registrado'
+                    );
+                    return json_encode($json, true);
+
+                }
+
+            }
+
+        }
+
+    }
+
 
 }
