@@ -1,14 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use App\Models\Detalle_Jornadas;
 use App\Models\Sedes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Voluntarios;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class VoluntariosController extends Controller
 {
@@ -262,6 +262,49 @@ class VoluntariosController extends Controller
             }
 
         }
+
+    }
+
+    //Reporte de voluntarios
+    public function reporte(){
+
+        //Select de la tabla voluntarios
+        $voluntarios = Voluntarios::all();
+        //Creamos objeto de hoja de calculo
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'id_voluntario');
+        $sheet->setCellValue('B1', 'id_insti');
+        $sheet->setCellValue('C1', 'id_municipio');
+        $sheet->setCellValue('D1', 'nombre');
+        $sheet->setCellValue('E1', 'ape_pat');
+        $sheet->setCellValue('F1', 'ape_mat');
+        $sheet->setCellValue('G1', 'curp');
+        $sheet->setCellValue('H1', 'fecha_nacimiento');
+        $sheet->setCellValue('I1', 'tel');
+        $sheet->setCellValue('J1', 'email');
+        $sheet->setCellValue('K1', 'activo');
+        $rows = 2;
+        foreach ($voluntarios as $one){
+            $sheet->setCellValue('A' . $rows, $one['id_voluntario']);
+            $sheet->setCellValue('B' . $rows, $one['id_insti']);
+            $sheet->setCellValue('C' . $rows, $one['id_municipio']);
+            $sheet->setCellValue('D' . $rows, $one['nombre']);
+            $sheet->setCellValue('E' . $rows, $one['ape_pat']);
+            $sheet->setCellValue('F' . $rows, $one['ape_mat']);
+            $sheet->setCellValue('G' . $rows, $one['curp']);
+            $sheet->setCellValue('H' . $rows, $one['fecha_nacimiento']);
+            $sheet->setCellValue('I' . $rows, $one['tel']);
+            $sheet->setCellValue('J' . $rows, $one['email']);
+            $sheet->setCellValue('K' . $rows, $one['activo']);
+            $rows++;
+        }
+
+        $fileName = 'voluntarios_'.date('d-m-Y').'.xlsx';
+        $writer = new Xlsx($spreadsheet);
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment; filename="'. urlencode($fileName).'"');
+        $writer->save('php://output');
 
     }
 

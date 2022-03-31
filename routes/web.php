@@ -39,6 +39,8 @@ Route::delete('/instituciones/destroy/{id}', 'App\Http\Controllers\Instituciones
 // RUTAS DE VOLUNTARIOS
 //Listado de voluntarios
 Route::get('/voluntarios', 'App\Http\Controllers\VoluntariosController@index');
+//Descargar Reporte de voluntarios
+Route::get('/voluntarios/reporte', 'App\Http\Controllers\VoluntariosController@reporte');
 //Eliminación de un voluntario
 Route::delete('/voluntarios/destroy/{id_voluntario}', 'App\Http\Controllers\VoluntariosController@destroy');
 //Listar registro de todos los voluntarios por institución
