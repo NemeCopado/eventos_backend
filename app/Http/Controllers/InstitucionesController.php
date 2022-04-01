@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -81,10 +82,14 @@ class InstitucionesController extends Controller
             "rol"=>$request->input('rol'),
             "tel"=>$request->input('tel'),
             "email"=>$request->input('email'),
-            "password"=>$request->input('password'));
+            "password"=>$request->input('password'),
+            "activo"=>1,
+            );
 
-        //Validamos que no estén vacíos los datos ingresados por el usuario
-        if(!empty($datos)){
+        //Validamos que el enlace que se quiere registrar ya haya estado registrado antes y que tenga eliminado lógico
+        $usuario = Usuarios::where('email', $datos['email'])->first();
+
+        if ($usuario){
 
             //Validar formato de datos
             $validator = Validator::make($datos, [
@@ -105,65 +110,119 @@ class InstitucionesController extends Controller
             if ($validator -> fails()) {
 
                 $errors = $validator->errors();
+                return response()->json([
+                    'detalles'=>$errors
+                ], 400);
 
-                $json = array(
-                    "status" => 404,
-                    "detalles" => $errors
-                );
-
-                return json_encode($json, true);
-
-            //Si pasa la validación de formato, continuamos el proceso
+                //Si pasa la validación de formato, continuamos el proceso de reactivación
+                // de la institución y su enlace y actualizamos con los nuevos datos proporcionados
             }else{
 
-                $instituciones = new Instituciones();
-                $instituciones->nombre=$datos["institucion_nombre"];
-                $instituciones->domicilio=$datos["domicilio"];
-                $instituciones->id_municipio=$datos["id_municipio"];
-                $instituciones->activo=1;
-
-                if($instituciones->save()){
-
-                    $usuarios = new Usuarios();
-                    $usuarios->nombre=$datos["usuario_nombre"];
-                    $usuarios->ape_pat=$datos["usuario_ape_pat"];
-                    $usuarios->ape_mat=$datos["usuario_ape_mat"];
-                    $usuarios->id_insti=$instituciones->id;
-                    $usuarios->cargo=$datos["cargo"];
-                    $usuarios->rol=$datos["rol"];
-                    $usuarios->tel=$datos["tel"];
-                    $usuarios->email=$datos["email"];
-                    $usuarios->password=Hash::make($datos["password"]);
-                    $usuarios->activo=1;
-
-                    if ($usuarios->save()){
+                if ($institucion = Instituciones::where('id_insti', $usuario->id_insti) -> update(
+                    array('nombre'=>$datos['institucion_nombre'],
+                        'domicilio'=>$datos['domicilio'],
+                        'id_municipio'=>$datos['id_municipio'],
+                        'activo'=>1)
+                )){
+                    if ($usuario = Usuarios::where('email', $datos['email'])->update(
+                        array('nombre'=>$datos['usuario_nombre'],
+                            'ape_pat'=>$datos['usuario_ape_pat'],
+                            'ape_mat'=>$datos['usuario_ape_mat'],
+                            'id_insti'=>DB::table('instituciones')->latest()->first()->id_insti,
+                            'cargo'=>$datos['cargo'],
+                            'rol'=>$datos['rol'],
+                            'tel'=>$datos['tel'],
+                            'password'=>Hash::make($datos['password']),
+                            'activo'=>1,
+                        )
+                    )){
 
                         return response()->json([
-                            'detalles'=>'Se ha registrado la institución y su enlace satisfactoriamente'
-                        ], 201);
+                            'detalle'=>'Se ha reactivado la institución y el enlace y se han actualizado los datos'
+                        ]);
 
                     }
-
-                }else{
-
-                    return response()->json([
-                        'detalles'=>'Error en el registro de la institución',
-                    ], 400);
-
                 }
-
 
             }
 
-        //Si está vacío el arreglo, retornamos status de error
         }else{
 
-            $json = array(
-                "status" => 404,
-                "detalles" => "Los registros no pueden estar vacíos"
-            );
+            //Validamos que no estén vacíos los datos ingresados por el usuario
+            if(!empty($datos)){
 
-            return json_encode($json, true);
+                //Validar formato de datos
+                $validator = Validator::make($datos, [
+                    'institucion_nombre' => 'required|string',
+                    'domicilio'=> 'required|string',
+                    'id_municipio'=>'required|integer',
+                    'usuario_nombre'=>'required|string',
+                    'usuario_ape_pat'=>'required|string',
+                    'usuario_ape_mat'=>'required|string',
+                    'cargo'=>'required|string',
+                    'rol'=>'required|string',
+                    'tel'=>'required|integer',
+                    'email'=>'required|email:rfc|unique:usuarios,email',
+                    'password'=>'required|string',
+                ]);
+
+                //Si falla la validación del formato
+                if ($validator -> fails()) {
+
+                    $errors = $validator->errors();
+                    return response()->json([
+                        'detalles'=>$errors
+                    ], 400);
+
+                    //Si pasa la validación de formato, continuamos el proceso
+                }else{
+
+                    $instituciones = new Instituciones();
+                    $instituciones->nombre=$datos["institucion_nombre"];
+                    $instituciones->domicilio=$datos["domicilio"];
+                    $instituciones->id_municipio=$datos["id_municipio"];
+                    $instituciones->activo=1;
+
+                    if($instituciones->save()){
+
+                        $usuarios = new Usuarios();
+                        $usuarios->nombre=$datos["usuario_nombre"];
+                        $usuarios->ape_pat=$datos["usuario_ape_pat"];
+                        $usuarios->ape_mat=$datos["usuario_ape_mat"];
+                        $usuarios->id_insti=$instituciones->id;
+                        $usuarios->cargo=$datos["cargo"];
+                        $usuarios->rol=$datos["rol"];
+                        $usuarios->tel=$datos["tel"];
+                        $usuarios->email=$datos["email"];
+                        $usuarios->password=Hash::make($datos["password"]);
+                        $usuarios->activo=1;
+
+                        if ($usuarios->save()){
+
+                            return response()->json([
+                                'detalles'=>'Se ha registrado la institución y su enlace satisfactoriamente'
+                            ], 201);
+
+                        }
+
+                    }else{
+
+                        return response()->json([
+                            'detalles'=>'Error en el registro de la institución',
+                        ], 400);
+
+                    }
+
+                }
+
+                //Si está vacío el arreglo, retornamos status de error
+            }else{
+
+                return response()->json([
+                    'detalles'=>'Los registros no pueden estar vacíos',
+                ], 400);
+
+            }
 
         }
 
