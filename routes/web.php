@@ -13,18 +13,15 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::get('/', function () {
-//     return view('welcome');
-// });
-
 // RUTAS DE USUARIOS
+//Login de un usuario
+Route::get('/usuarios/login', 'App\Http\Controllers\UsuariosController@login');
 //Listado de usuarios
 Route::get('/usuarios', 'App\Http\Controllers\UsuariosController@index');
 //Listado de un solo usuario
 Route::get('/usuarios/{id}', 'App\Http\Controllers\UsuariosController@show');
 //Actualización de un usuario
 Route::put('/usuarios/update/{id}', 'App\Http\Controllers\UsuariosController@update');
-
 
 // RUTAS DE INSTITUCIONES
 //Listado de instituciones

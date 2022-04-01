@@ -138,21 +138,17 @@ class InstitucionesController extends Controller
 
                     if ($usuarios->save()){
 
-                        $json = array(
-                            "status" => 200,
-                            "detalles" => "Se ha registrado la institución y su enlace satisfactoriamente"
-                        );
-                        return json_encode($json, true);
+                        return response()->json([
+                            'detalles'=>'Se ha registrado la institución y su enlace satisfactoriamente'
+                        ], 201);
 
                     }
 
                 }else{
 
-                    $json = array(
-                        "status" => 200,
-                        "detalles" => "Error en el registro de la institución"
-                    );
-                    return json_encode($json, true);
+                    return response()->json([
+                        'detalles'=>'Error en el registro de la institución',
+                    ], 400);
 
                 }
 

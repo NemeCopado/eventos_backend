@@ -30,13 +30,10 @@ class UsuariosController extends Controller
             ->where('instituciones.activo', 1)
             ->paginate(15);
 
-        $json = array(
-            "status"=>200,
-            "total_registros"=>count($usuarios),
-            "details"=>$usuarios
-        );
-
-        return json_encode($json, true);
+        return response()->json([
+            'total registros'=>count($usuarios),
+            'detalles'=>$usuarios
+        ], 200);
 
     }
 
@@ -58,17 +55,18 @@ class UsuariosController extends Controller
             ->get();
 
         if(!empty($usuario[0])){
-            $json = array(
-                "status" => 200,
-                "details" => $usuario
-            );
+
+            return response()->json([
+                'detalles'=>$usuario
+            ], 200);
+
         }else{
-            $json = array(
-                "status" => 200,
-                "details" => "Este usuario no existe o está desactivado."
-            );
+
+            return response()->json([
+                'detalles'=>'Este usuario no existe o está desactivado.'
+            ], 400);
+
         }
-        return json_encode($json, true);
 
     }
 
@@ -115,15 +113,11 @@ class UsuariosController extends Controller
 
                     $errors = $validator->errors();
 
-                    $json = array(
-                        "status" => 404,
-                        "detalles" => $errors
-                    );
-
-                    return json_encode($json, true);
+                    return response()->json([
+                        'detalles'=>$errors
+                    ], 400);
 
                 }else{
-
 
                     $datos = array( "nombre"=>$datos['nombre'],
                         "ape_pat"=>$datos['ape_pat'],
@@ -136,39 +130,40 @@ class UsuariosController extends Controller
                         "activo"=>$datos['activo']);
 
                     //Actualizamos el registro
-                    $usuarios = Usuarios::where('id_user', $id) -> update($datos);
+                    if (Usuarios::where('id_user', $id) -> update($datos)){
 
-                    $json = array(
-                        "status" => 200,
-                        "detalles" => "Registro actualizado exitosamente"
-                    );
+                        return response()->json([
+                            'detalles'=>'Registro actualizado exitosamente'
+                        ], 200);
 
-                    return json_encode($json, true);
+                    }
 
                 }
 
             }else{
 
-                $json = array(
-                    "status" => 404,
-                    "detalles" => "Los registros no pueden estar vacíos"
-                );
-
-                return json_encode($json, true);
+                return response()->json([
+                    'detalles'=>'Los campos no pueden estar vacíos'
+                ], 400);
 
             }
         }else{
 
-            $json = array(
-                "status" => 200,
-                "details" => "No hay ningún usuario registrado con ese ID"
-            );
+            return response()->json([
+                'detalles'=>'No se encontró usuario registrado con ese Id'
+            ], 404);
 
         }
 
-        return json_encode($json, true);
-
     }
 
+    //LOGIN DE USUARIOS
+    public function login(Request $request){
+
+        return response()->json([
+            'detalle'=>'No encontrado'
+        ], 418);
+
+    }
 
 }

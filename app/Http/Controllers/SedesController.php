@@ -13,14 +13,15 @@ class SedesController extends Controller
     //Listado de sedes
     public function index(){
 
-        $sedes = Sedes::all();
-
-        $json = array(
-            "status" => 404,
-            "detalles" => $sedes,
-        );
-
-        return json_encode($json, true);
+        if($sedes = Sedes::all()){
+            return response()->json([
+                'detalles'=>$sedes
+            ]);
+        }else{
+            return response()->json([
+                'detalles'=>'Problemas al retornar las sedes'
+            ], 400);
+        }
 
     }
 
@@ -68,11 +69,9 @@ class SedesController extends Controller
 
                 $errors = $validator->errors();
 
-                $json = array(
-                    "status" => 404,
-                    "detalles" => $errors
-                );
-                return json_encode($json, true);
+                return response()->json([
+                    'detalles'=>$errors
+                ], 400);
 
             //Si pasa la validación de formato, continuamos el proceso
             }else{
@@ -94,17 +93,17 @@ class SedesController extends Controller
                 $sede->cupo=$datos["cupo"];
 
                 if ($sede->save()){
-                    $json = array(
-                        "status" => 200,
-                        "detalles" => "Se registro la sede satisfactoriamente",
-                    );
-                    return json_encode($json, true);
+
+                    return response()->json([
+                        'detalles'=>'Se registró la sede satisfactoriamente'
+                    ]);
+
                 }else{
-                    $json = array(
-                        "status" => 404,
-                        "detalles" => "Ocurrió un error al registrar la sede",
-                    );
-                    return json_encode($json, true);
+
+                    return response()->json([
+                        'detalles'=>'Ocurrió un error al registrar la sede'
+                    ], 400);
+
                 }
 
             }
@@ -119,17 +118,17 @@ class SedesController extends Controller
 
         //Elimnado lógico de la sede
         if (DB::table('sedes')->where('id_sede', $id_sede)->update(['activo'=>0])){
-            $json = array(
-                "status" => 200,
-                "details" => "Se eliminó la satisfactoriamente."
-            );
-            return json_encode($json, true);
+
+            return response()->json([
+                'detalles'=>'Se eliminó la sede satisfactoriamente'
+            ]);
+
         }else{
-            $json = array(
-                "status" => 404,
-                "details" => "Error al eliminar la sede solicitada."
-            );
-            return json_encode($json, true);
+
+            return response()->json([
+                'detalles'=>'Error al eliminar la sede solicitada'
+            ], 400);
+
         }
 
     }
@@ -183,12 +182,9 @@ class SedesController extends Controller
 
                 $errors = $validator->errors();
 
-                $json = array(
-                    "status" => 404,
-                    "detalles" => $errors
-                );
-
-                return json_encode($json, true);
+                return response()->json([
+                    'detalles'=>$errors
+                ], 400);
 
             }else{
 
@@ -210,21 +206,15 @@ class SedesController extends Controller
                 //Actualizamos el registro
                 if ($sede = Sedes::where('id_sede', $id_sede) -> update($datos)){
 
-                    $json = array(
-                        "status" => 200,
-                        "detalles" => "Registro actualizado exitosamente"
-                    );
-
-                    return json_encode($json, true);
+                    return response()->json([
+                        'detalles'=>'Registro actualizado exitosamente'
+                    ]);
 
                 }else{
 
-                    $json = array(
-                        "status" => 404,
-                        "detalles" => "Error al actualizar el registro."
-                    );
-
-                    return json_encode($json, true);
+                    return response()->json([
+                        'detalles'=>'Error al actualizar el registro'
+                    ], 400);
 
                 }
 
@@ -232,12 +222,9 @@ class SedesController extends Controller
 
         }else{
 
-            $json = array(
-                "status" => 404,
-                "details" => "No hay ninguna sede registrada con ese Id"
-            );
-
-            return json_encode($json, true);
+            return response()->json([
+                'detalles'=>'No hay ninguna sede registrada con ese Id'
+            ], 400);
 
         }
 

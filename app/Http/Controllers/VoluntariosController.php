@@ -17,7 +17,7 @@ class VoluntariosController extends Controller
     public function index(){
 
         //Select de los voluntarios
-        $voluntarios = DB::table('usuarios')
+        if ($voluntarios = DB::table('usuarios')
             ->leftJoin('instituciones', 'usuarios.id_insti', 'instituciones.id_insti')
             ->leftjoin('voluntarios', 'usuarios.id_insti', '=', 'voluntarios.id_insti')
             ->select(DB::raw('CONCAT(voluntarios.nombre, " ", voluntarios.ape_pat, " ", voluntarios.ape_mat) AS voluntario'),
@@ -28,15 +28,20 @@ class VoluntariosController extends Controller
             ->where('usuarios.activo', 1)
             ->where('instituciones.activo', 1)
             ->where('voluntarios.activo', 1)
-            ->get();
+            ->get()){
 
-        $json = array(
-            "status"=>200,
-            "total_registros"=>count($voluntarios),
-            "details"=>$voluntarios
-        );
+            return response()->json([
+                'total_registros'=>count($voluntarios),
+                'detalles'=>$voluntarios
+            ]);
 
-        return json_encode($json, true);
+        }else{
+
+            return response()->json([
+                'detalles'=>'Error al listar los voluntarios'
+            ], 400);
+
+        }
 
     }
 
@@ -45,17 +50,17 @@ class VoluntariosController extends Controller
 
         //Update de activo y eliminado
         if (DB::table('voluntarios')->where('id_voluntario', $id_voluntario)->update(['activo'=>0, 'eliminado'=>1])){
-            $json = array(
-                "status" => 200,
-                "details" => "Se eliminó el voluntario satisfactoriamente"
-            );
-            return json_encode($json, true);
+
+            return response()->json([
+                'detalles'=>'Se eliminó al voluntario satisfactoriamente'
+            ]);
+
         }else{
-            $json = array(
-                "status" => 200,
-                "details" => "Error al eliminar el voluntario"
-            );
-            return json_encode($json, true);
+
+            return response()->json([
+                'detalles'=>'Error al eliminar al voluntario'
+            ], 400);
+
         }
 
     }
@@ -72,30 +77,25 @@ class VoluntariosController extends Controller
         //Verificamos que exista registro de institución con el id requerido
         if(!empty($institucion[0])){
 
-            //Buscamos a todos los voluntarios pertenecientes a la institución solicitada
-            $voluntarios = DB::table('voluntarios')
+            //Buscamos a todos los voluntarios pertenecientes a la institución solicitados
+            //Retornamos los datos arrojados
+            if ($voluntarios = DB::table('voluntarios')
                 ->where('id_insti', $id_institucion)
                 ->where('activo', 1)
-                ->get();
+                ->get()){
 
-            //Retornamos los datos arrojados
-            $json = array(
-                "status"=>200,
-                "total_registros"=>count($voluntarios),
-                "details"=>$voluntarios
-            );
+                return response()->json([
+                    'detalles'=>$voluntarios
+                ]);
 
-            return json_encode($json, true);
+            }
 
         //En caso de no existir la institución solicitada mostramos mensaje
         }else{
 
-            $json = array(
-                "status"=>200,
-                "details"=>'No hay ninguna institución registrada con esa Id'
-            );
-
-            return json_encode($json, true);
+            return response()->json([
+                'detalles'=>'No hay ninguna institución registrada con esa Id'
+            ], 400);
 
         }
 
@@ -137,11 +137,9 @@ class VoluntariosController extends Controller
 
                 $errors = $validator->errors();
 
-                $json = array(
-                    "status" => 404,
-                    "detalles" => $errors
-                );
-                return json_encode($json, true);
+                return response()->json([
+                    'detalles'=>$errors
+                ], 400);
 
             //Si pasa la validación de formato, continuamos el proceso
             }else{
@@ -160,21 +158,20 @@ class VoluntariosController extends Controller
                 $voluntario->eliminado=0;
 
                 if ($voluntario->save()){
-                    $json = array(
-                        "status" => 200,
+
+                    return response()->json([
                         "detalles" => "Se registro el voluntario satisfactoriamente "."con Id: ".$voluntario->id,
-                    );
-                    return json_encode($json, true);
+                    ]);
+
                 }else{
-                    $json = array(
-                        "status" => 404,
-                        "detalles" => "Ocurrió un error al registrar al voluntario",
-                    );
-                    return json_encode($json, true);
+
+                    return response()->json([
+                        'detalles'=>'Ocurrió un error al registrar al voluntario'
+                    ], 400);
+
                 }
 
             }
-
 
         }
 
@@ -210,13 +207,9 @@ class VoluntariosController extends Controller
 
             if ($validator -> fails()) {
 
-                $errors = $validator->errors();
-
-                $json = array(
-                    "status" => 404,
-                    "detalles" => $errors
-                );
-                return json_encode($json, true);
+                return response()->json([
+                    'detalles'=>$validator->errors()
+                ], 400);
 
                 //Si pasa la validación de formato, continuamos el proceso
             }else{
@@ -241,21 +234,19 @@ class VoluntariosController extends Controller
                     $detalle_jornada -> activo = $datos['activo'];
 
                     if($detalle_jornada->save()){
-                        $json = array(
-                            "status" => 200,
+
+                        return response()->json([
                             "detalles" => 'Se ha hecho la asignación al voluntario exitosamente.'
-                        );
-                        return json_encode($json, true);
+                        ]);
+
                     }
 
                 //Retornamos error de municipios distintos
                 }else{
 
-                    $json = array(
-                        "status" => 404,
+                    return response()->json([
                         "detalles" => 'El municipio de la sede no coincide con el municipio del voluntario registrado'
-                    );
-                    return json_encode($json, true);
+                    ], 400);
 
                 }
 
