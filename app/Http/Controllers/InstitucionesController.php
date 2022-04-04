@@ -8,10 +8,19 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Usuarios;
+use App\Models\User;
 use App\Models\Instituciones;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Exceptions\JWTException;
+
 
 class InstitucionesController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('jwt');
+    }
 
     //LISTADO DE INSTITUCIONES
     public function index(){
@@ -87,7 +96,7 @@ class InstitucionesController extends Controller
             );
 
         //Validamos que el enlace que se quiere registrar ya haya estado registrado antes y que tenga eliminado lógico
-        $usuario = Usuarios::where('email', $datos['email'])->first();
+        $usuario = Usuarios::where('email', $datos['email'])->where('activo', 0)->first();
 
         if ($usuario){
 
@@ -199,9 +208,13 @@ class InstitucionesController extends Controller
 
                         if ($usuarios->save()){
 
-                            return response()->json([
-                                'detalles'=>'Se ha registrado la institución y su enlace satisfactoriamente'
-                            ], 201);
+                            $user = User::create([
+                                'name' => $datos["usuario_nombre"] . ' ' . $datos["usuario_ape_pat"] . ' ' . $datos["usuario_ape_mat"],
+                                'email' => $datos["email"],
+                                'password' => Hash::make($datos["password"]),
+                            ]);
+                            $token = JWTAuth::fromUser($user);
+                            return response()->json(compact('user','token'),201);
 
                         }
 

@@ -13,6 +13,11 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 class VoluntariosController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('jwt');
+    }
+
     //Listado de voluntarios
     public function index(){
 

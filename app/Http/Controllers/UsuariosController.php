@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use http\Env\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Usuarios;
 use App\Models\Instituciones;
 use Illuminate\Support\Facades\DB;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class UsuariosController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('jwt');
+    }
 
     //LISTADO DE USUARIOS
     public function index(){
@@ -157,13 +164,5 @@ class UsuariosController extends Controller
 
     }
 
-    //LOGIN DE USUARIOS
-    public function login(Request $request){
-
-        return response()->json([
-            'detalle'=>'No encontrado'
-        ], 418);
-
-    }
 
 }

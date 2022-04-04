@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,10 +14,14 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+//RUTAS DE LOGIN
+Route::group(['middleware'=>[], 'prefix'=>'auth'], function(){
+    //Login
+    Route::post('/login', 'App\Http\Controllers\AuthController@login');
+});
+
 // RUTAS DE USUARIOS
-Route::group(['middeware'=>[], 'prefix'=>'usuarios'], function(){
-    //Login de un usuario
-    Route::get('/login', 'App\Http\Controllers\UsuariosController@login');
+Route::group(['middeware'=>['jwt'], 'prefix'=>'usuarios'], function(){
     //Listado de usuarios
     Route::get('/', 'App\Http\Controllers\UsuariosController@index');
     //Listado de un solo usuario
@@ -26,7 +31,7 @@ Route::group(['middeware'=>[], 'prefix'=>'usuarios'], function(){
 });
 
 // RUTAS DE INSTITUCIONES
-Route::group(['middeware'=>[], 'prefix'=>'instituciones'], function(){
+Route::group(['middeware'=>['jwt'], 'prefix'=>'instituciones'], function(){
     //Listado de instituciones
     Route::get('/', 'App\Http\Controllers\InstitucionesController@index');
     //Listado una sola institución
@@ -38,7 +43,7 @@ Route::group(['middeware'=>[], 'prefix'=>'instituciones'], function(){
 });
 
 // RUTAS DE VOLUNTARIOS
-Route::group(['middeware'=>[], 'prefix'=>'voluntarios'], function(){
+Route::group(['middeware'=>['jwt'], 'prefix'=>'voluntarios'], function(){
     //Listado de voluntarios
     Route::get('/', 'App\Http\Controllers\VoluntariosController@index');
     //Descargar Reporte de voluntarios
@@ -54,7 +59,7 @@ Route::group(['middeware'=>[], 'prefix'=>'voluntarios'], function(){
 });
 
 //RUTAS DE SEDES
-Route::group(['middeware'=>[], 'prefix'=>'sedes'], function(){
+Route::group(['middeware'=>['jwt'], 'prefix'=>'sedes'], function(){
     //Listado de sedes
     Route::get('/', 'App\Http\Controllers\SedesController@index');
     //Alta de sedes

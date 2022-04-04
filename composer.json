@@ -10,7 +10,8 @@
         "laravel/framework": "^9.2",
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
-        "phpoffice/phpspreadsheet": "dev-NumberFormatMask-Helpers"
+        "phpoffice/phpspreadsheet": "dev-NumberFormatMask-Helpers",
+        "tomfordrumm/jwt-auth": "dev-develop"
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",
