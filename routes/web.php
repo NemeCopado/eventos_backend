@@ -71,5 +71,7 @@ Route::group(['middleware'=>['jwt'], 'prefix'=>'sedes'], function(){
     Route::put('/update/{id_sede}', 'App\Http\Controllers\SedesController@update');
 });
 
-//RUTA EMAIL
-Route::post('/email/send', 'App\Http\Controllers\MailController@send');
+//RUTAS EMAIL
+Route::group(['middleware'=>['jwt'], 'prefix'=>'email'], function(){
+    Route::post('/send', 'App\Http\Controllers\MailController@send');
+});
