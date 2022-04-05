@@ -20,11 +20,11 @@ class UpdatesMailable extends Mailable
      *
      * @return void
      */
-    public function __construct($subject, $body, $data)
+    public function __construct($subject, $body, $files)
     {
         $this->subject = $subject;
         $this->body = $body;
-        $this->data = $data;
+        $this->files = $files;
     }
 
     /**
@@ -35,11 +35,14 @@ class UpdatesMailable extends Mailable
     public function build()
     {
         $this->view('emails.updates')->subject($this->subject);
-        foreach ($this->data['files'] as $file){
-            $this->attach($file->getRealPath(), [
-                'as' => $file->getClientOriginalName(),
-                'mime' => $file->getMimeType(),
-            ]);
+        if ($this->files){
+            foreach ($this->files as $file){
+                $this->attach($file->getRealPath(), [
+                    'as' => $file->getClientOriginalName(),
+                    'mime' => $file->getMimeType(),
+                ]);
+            }
         }
+        return $this;
     }
 }
