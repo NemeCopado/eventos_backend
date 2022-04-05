@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use App\Mail\UpdatesMailable;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +22,7 @@ Route::group(['middleware'=>[], 'prefix'=>'auth'], function(){
 });
 
 // RUTAS DE USUARIOS
-Route::group(['middeware'=>['jwt'], 'prefix'=>'usuarios'], function(){
+Route::group(['middleware'=>['jwt'], 'prefix'=>'usuarios'], function(){
     //Listado de usuarios
     Route::get('/', 'App\Http\Controllers\UsuariosController@index');
     //Listado de un solo usuario
@@ -31,7 +32,7 @@ Route::group(['middeware'=>['jwt'], 'prefix'=>'usuarios'], function(){
 });
 
 // RUTAS DE INSTITUCIONES
-Route::group(['middeware'=>['jwt'], 'prefix'=>'instituciones'], function(){
+Route::group(['middleware'=>['jwt'], 'prefix'=>'instituciones'], function(){
     //Listado de instituciones
     Route::get('/', 'App\Http\Controllers\InstitucionesController@index');
     //Listado una sola institución
@@ -43,7 +44,7 @@ Route::group(['middeware'=>['jwt'], 'prefix'=>'instituciones'], function(){
 });
 
 // RUTAS DE VOLUNTARIOS
-Route::group(['middeware'=>['jwt'], 'prefix'=>'voluntarios'], function(){
+Route::group(['middleware'=>['jwt'], 'prefix'=>'voluntarios'], function(){
     //Listado de voluntarios
     Route::get('/', 'App\Http\Controllers\VoluntariosController@index');
     //Descargar Reporte de voluntarios
@@ -59,7 +60,7 @@ Route::group(['middeware'=>['jwt'], 'prefix'=>'voluntarios'], function(){
 });
 
 //RUTAS DE SEDES
-Route::group(['middeware'=>['jwt'], 'prefix'=>'sedes'], function(){
+Route::group(['middleware'=>['jwt'], 'prefix'=>'sedes'], function(){
     //Listado de sedes
     Route::get('/', 'App\Http\Controllers\SedesController@index');
     //Alta de sedes
@@ -69,3 +70,6 @@ Route::group(['middeware'=>['jwt'], 'prefix'=>'sedes'], function(){
     //Actualización de una sede
     Route::put('/update/{id_sede}', 'App\Http\Controllers\SedesController@update');
 });
+
+//RUTA EMAIL
+Route::post('/email/send', 'App\Http\Controllers\MailController@send');

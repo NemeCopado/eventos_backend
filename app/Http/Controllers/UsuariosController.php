@@ -15,11 +15,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UsuariosController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('jwt');
-    }
-
     //LISTADO DE USUARIOS
     public function index(){
 

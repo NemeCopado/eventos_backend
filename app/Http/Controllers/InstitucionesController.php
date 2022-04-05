@@ -17,11 +17,6 @@ use Tymon\JWTAuth\Exceptions\JWTException;
 class InstitucionesController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('jwt');
-    }
-
     //LISTADO DE INSTITUCIONES
     public function index(){
 

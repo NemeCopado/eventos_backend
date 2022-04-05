@@ -10,11 +10,6 @@ use Illuminate\Support\Facades\Validator;
 class SedesController extends Controller
 {
 
-    public function __construct()
-    {
-        $this->middleware('jwt');
-    }
-
     //Listado de sedes
     public function index(){
 
