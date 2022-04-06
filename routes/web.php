@@ -59,6 +59,10 @@ Route::group(['middleware'=>['jwt'], 'prefix'=>'voluntarios'], function(){
     Route::post('/asignarSede', 'App\Http\Controllers\VoluntariosController@asignarSede');
 });
 
+//CONFIRMACIÓN DE JORNADAS
+Route::get('voluntario/confirmar/{id_detalle_jornada}', 'App\Http\Controllers\Confirmacion@confirmarSede');
+Route::get('voluntario/rechazar/{id_detalle_jornada}', 'App\Http\Controllers\Confirmacion@rechazarSede');
+
 //RUTAS DE SEDES
 Route::group(['middleware'=>['jwt'], 'prefix'=>'sedes'], function(){
     //Listado de sedes
@@ -73,5 +77,6 @@ Route::group(['middleware'=>['jwt'], 'prefix'=>'sedes'], function(){
 
 //RUTAS EMAIL
 Route::group(['middleware'=>['jwt'], 'prefix'=>'email'], function(){
-    Route::post('/send', 'App\Http\Controllers\MailController@send');
+    Route::post('/enviarEmail', 'App\Http\Controllers\MailController@enviarEmail');
 });
+

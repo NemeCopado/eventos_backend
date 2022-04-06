@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ConfirmarSedeMailable;
 use http\Env\Response;
 use Illuminate\Http\Request;
 use App\Mail\UpdatesMailable;
@@ -11,7 +12,7 @@ use Illuminate\Support\Facades\Validator;
 class MailController extends Controller
 {
 
-    public function send(Request $request){
+    public function enviarEmail(Request $request){
 
         $data = $request->all();
 
@@ -23,7 +24,11 @@ class MailController extends Controller
         ]);
 
         if ($validator->fails()){
-            return $validator->errors();
+
+            return response()->json([
+                'detalles' => $validator->errors(),
+            ], 400);
+
         }else{
 
             $subject = $data['subject'];
@@ -35,13 +40,11 @@ class MailController extends Controller
 
             try{
                 Mail::to([])->bcc($data['receivers'])->send(new UpdatesMailable($subject, $body, $files));
-                return response()->json([
-                    'details'=> 'Se han mandado los correos satisfactoriamente'
-                ]);
+            return response()->json([
+                'details'=> 'Se han mandado los correos satisfactoriamente'
+            ]);
             }catch(\Exception $e){
-                return response()->json([
-                    'details'=> Mail::failures()
-                ], 400);
+
             }
 
         }

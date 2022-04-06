@@ -52,8 +52,11 @@ class AuthController extends Controller
 
             }
 
+            $usuario = User::where('email', $credentials['email'])->get();
+
             return response()->json([
-                'token'=> $token
+                'token'=> $token,
+                'user' => $usuario
             ]);
 
         }

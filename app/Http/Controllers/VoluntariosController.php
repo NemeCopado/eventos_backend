@@ -1,10 +1,14 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Mail\ConfirmarSedeMailable;
+use App\Mail\UpdatesMailable;
 use App\Models\Detalle_Jornadas;
+use App\Models\Jornadas;
 use App\Models\Sedes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Voluntarios;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -27,7 +31,7 @@ class VoluntariosController extends Controller
             )
             ->where('usuarios.activo', 1)
             ->where('instituciones.activo', 1)
-            ->where('voluntarios.activo', 1)
+            ->where('voluntarios.eliminado', 0)
             ->get()){
 
             return response()->json([
@@ -48,8 +52,8 @@ class VoluntariosController extends Controller
     //Eliminación de un voluntario
     public function destroy($id_voluntario){
 
-        //Update de activo y eliminado
-        if (DB::table('voluntarios')->where('id_voluntario', $id_voluntario)->update(['activo'=>0, 'eliminado'=>1])){
+        //Eliminado lógico
+        if (DB::table('voluntarios')->where('id_voluntario', $id_voluntario)->update(['eliminado'=>1])){
 
             return response()->json([
                 'detalles'=>'Se eliminó al voluntario satisfactoriamente'
@@ -218,6 +222,9 @@ class VoluntariosController extends Controller
                 $voluntario = Voluntarios::where('id_voluntario', $datos['id_voluntario'])->first();
                 //Buscamos la información de la sede
                 $sede = Sedes::where('id_sede', $datos['id_sede'])->first();
+                //Armamos el nombre completo del voluntario para usarlo en el correo
+                $nombre_voluntario = $voluntario['nombre'] . ' ' . $voluntario['ape_pat'] . ' ' . $voluntario['ape_mat'];
+                $jornada = Jornadas::where('id_jornada', $datos['id_jornada'])->first();
 
                 //Si el municipio de la sede coincide con el municipio del voluntario registrado continúa el proceso
                 if ($voluntario->id_municipio == $sede -> id_municipio){
@@ -229,15 +236,20 @@ class VoluntariosController extends Controller
                     $detalle_jornada -> turno = $datos['turno'];
                     $detalle_jornada -> uuid = $datos['uuid'];
                     $detalle_jornada -> horas = $datos['horas'];
-                    $detalle_jornada -> correo_enviado = 1;
+                    $detalle_jornada -> correo_enviado = 0;
                     $detalle_jornada -> eliminado = 0;
-                    $detalle_jornada -> activo = $datos['activo'];
 
                     if($detalle_jornada->save()){
-
-                        return response()->json([
-                            "detalles" => 'Se ha hecho la asignación al voluntario exitosamente.'
-                        ]);
+                        $id_detalle_jornada = $detalle_jornada->id;
+                        $id_voluntario = $datos['id_voluntario'];
+                        $fecha = $jornada['fecha_inicio'];
+                        $lugar = $sede['nombre'] . ' ' . $sede['direccion'] . ' ' . $sede['cruce_calles'] . ' ' . $sede['colonia'] . ' ' . $sede['cp'];
+                        Mail::to([])->bcc($voluntario['email'])->send(new ConfirmarSedeMailable($nombre_voluntario, $id_detalle_jornada, $fecha, $lugar));
+                        if (Detalle_Jornadas::where('id_voluntario', $id_voluntario)->update(['correo_enviado'=>1])){
+                            return response()->json([
+                                "detalles" => 'Se ha hecho la asignación al voluntario exitosamente y se le ha mandado correo para confirmar participación.'
+                            ]);
+                        }
 
                     }
 

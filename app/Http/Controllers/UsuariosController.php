@@ -15,7 +15,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class UsuariosController extends Controller
 {
 
-    //LISTADO DE USUARIOS
+    //LISTADO DE USUARIOS (INSTITUCIÓN)
     public function index(){
 
         //Select de los usuarios con relación de institución
